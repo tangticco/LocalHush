@@ -1,6 +1,5 @@
-package net.ednovak.ultrasound;
+package Demodulation;
 
-import android.util.Log;
 
 /**
  * Created by enovak on 12/12/16.

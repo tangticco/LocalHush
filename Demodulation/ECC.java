@@ -1,9 +1,4 @@
-package net.ednovak.ultrasound;
-
-import android.util.Log;
-import android.util.StringBuilderPrinter;
-
-import java.util.ArrayList;
+package Demodulation;
 
 /**
  * Created by zhuofantang on 6/20/17.

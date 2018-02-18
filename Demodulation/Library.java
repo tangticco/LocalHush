@@ -1,4 +1,4 @@
-package net.ednovak.ultrasound;
+package Demodulation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,18 +10,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
-import android.content.Context;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
-import android.util.Log;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+package Demodulation;
 
 public class Library {
 	private static String TAG = Library.class.getName();
-	
+
 	// 882 samples @ 44.1khz = 0.02 seconds = 20.0ms
 	// 1024 samples @ 44.1khz = 0.02 seconds = 23.2ms
 	// 1536 samples @ 44.1khz = 0.03 seconds = 34.5ms
@@ -39,7 +32,7 @@ public class Library {
 
 	public final static double AMP_LOW = 0.19;
 	public final static double AMP_HIGH = 1.0;
-	
+
 	public final static int HAIL_TYPE_SWEEP = 1;
 	public final static int HAIL_TYPE_STATIC = 2;
 
@@ -75,23 +68,23 @@ public class Library {
         at.write(sound, 0, sound.length);
         at.play();
     }
-	
+
     public static short[] makeHail(int type){
-    	
+
     	short[] tmp = new short[HAIL_SIZE];
-    	
+
 		int thirdIndex = tmp.length / 3;
 		final double volDelta = 1.0 / (double)thirdIndex;
 		double volume = 0;
-		
+
 		final double freqDelta = 1000.0 / HAIL_SIZE; // change 1000Hz across HAIL_SIZE = 300 samples
 		double f; // cur frequency
-    	
+
 		for(int i = 0; i < tmp.length; i++){
 			if (i < thirdIndex) { //increase volume
 				volume += volDelta;
 			}
-		
+
 			if (i > thirdIndex*2){ // decrease volume
 				volume -= volDelta;
 			}
@@ -102,7 +95,7 @@ public class Library {
 				double val = getSample(i, 18000, 0) * amp;
 				tmp[i] = double2Short(val);
 			}
-			
+
 			else if(type == HAIL_TYPE_SWEEP){ // Sweeps between 18kHz and ...
 				f = 18000 + (freqDelta*i);
 				double val = getSample(i, f, 0) * amp;
@@ -113,7 +106,7 @@ public class Library {
     	return tmp;
     }
 
-    
+
     // Gets one sample from a sin wave
     // output (double s) should be between 0 and 1
 	// where 0 is silent (nonsense) and 1 is full volume
@@ -125,21 +118,21 @@ public class Library {
 		assert s >= 0 && s <= 1;
 		return s;
     }
-    
+
     private static void addFreq(double[] curSignalSeg, double newFreq, double p, double vol, int offset){
     	for(int i = 0; i < curSignalSeg.length; i++){
     		curSignalSeg[i] += getSample(i+offset, newFreq, p) * vol;
     	}
     }
-    
-    
+
+
     public static double fadeIn(int input, double fadeL){
     	double ans = Math.sqrt((1.0/fadeL) * input);
     	//Log.d(TAG, "input: " + input + " fadeL: " + fadeL + " ans: " + ans);
     	return ans;
     }
-    
-    
+
+
     // Returns the magnitude of the entire transmission
     private static int getL(double freqsPerSeg, int bitStringLength){
     	double bitsPerSeg = freqsPerSeg*2; // ( amp & phase on all sub-carriers)
@@ -148,7 +141,7 @@ public class Library {
     	int l = (durs * DATA_FRAME_SIZE) + HAIL_SIZE;
     	return l;
     }
-    
+
     public static double getABSMax(double[] input){
     	double max = 0;
     	for(int i = 0; i < input.length; i++){
@@ -158,7 +151,7 @@ public class Library {
     	}
     	return max;
     }
-    
+
     public static double getABSMax(short[] input){
     	double max = 0;
     	for(int i = 0; i < input.length; i++){
@@ -168,7 +161,7 @@ public class Library {
     	}
     	return max;
     }
-    
+
     private static char getBit(String bitString, int index){
     	try{
     		return bitString.charAt(index);
@@ -177,7 +170,7 @@ public class Library {
     		return '1';
     	}
     }
-    
+
     public static String getRandomBits(int l){
     	StringBuilder sb = new StringBuilder();
 
@@ -190,7 +183,7 @@ public class Library {
     	}
     	return sb.toString();
     }
-    
+
     public static void blinkView(boolean on, Context ctx, View v){
     	if(on){
     		Animation a = AnimationUtils.loadAnimation(ctx, R.anim.blink);

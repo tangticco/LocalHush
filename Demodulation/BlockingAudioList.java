@@ -1,7 +1,4 @@
-package net.ednovak.ultrasound;
-
-
-import android.util.Log;
+package Demodulation;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
