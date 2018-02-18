@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
-package Demodulation;
 
 public class Library {
 	private static String TAG = Library.class.getName();
@@ -53,21 +52,21 @@ public class Library {
     public final static String AMP_GND = "100100000000010100001001000100001101010010111000010001110001100110010100111101";
     public final static String PHS_GND = "011000001010010001101011100011100110011110110010101101001110111110101111011011";
 
-	public static AudioTrack getAudioTrack(int sizeInBytes){
-		AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, (int)Library.SAMPLE_RATE,
-				AudioFormat.CHANNEL_OUT_MONO,
-				AudioFormat.ENCODING_PCM_16BIT, sizeInBytes,
-				AudioTrack.MODE_STATIC);
-
-		return at;
-	}
-
-	public static void playSound(short[] sound){
-        int lenInBytes= sound.length * 2;
-        AudioTrack at = getAudioTrack(lenInBytes);
-        at.write(sound, 0, sound.length);
-        at.play();
-    }
+	// public static AudioTrack getAudioTrack(int sizeInBytes){
+	// 	AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, (int)Library.SAMPLE_RATE,
+	// 			AudioFormat.CHANNEL_OUT_MONO,
+	// 			AudioFormat.ENCODING_PCM_16BIT, sizeInBytes,
+	// 			AudioTrack.MODE_STATIC);
+	//
+	// 	return at;
+	// }
+	//
+	// public static void playSound(short[] sound){
+    //     int lenInBytes= sound.length * 2;
+    //     AudioTrack at = getAudioTrack(lenInBytes);
+    //     at.write(sound, 0, sound.length);
+    //     at.play();
+    // }
 
     public static short[] makeHail(int type){
 
@@ -128,7 +127,7 @@ public class Library {
 
     public static double fadeIn(int input, double fadeL){
     	double ans = Math.sqrt((1.0/fadeL) * input);
-    	//Log.d(TAG, "input: " + input + " fadeL: " + fadeL + " ans: " + ans);
+    	//System.out.println(TAG +  "input: " + input + " fadeL: " + fadeL + " ans: " + ans);
     	return ans;
     }
 
@@ -184,15 +183,15 @@ public class Library {
     	return sb.toString();
     }
 
-    public static void blinkView(boolean on, Context ctx, View v){
-    	if(on){
-    		Animation a = AnimationUtils.loadAnimation(ctx, R.anim.blink);
-    		v.startAnimation(a);
-    	}
-    	else{
-    		v.clearAnimation();
-    	}
-    }
+    // public static void blinkView(boolean on, Context ctx, View v){
+    // 	if(on){
+    // 		Animation a = AnimationUtils.loadAnimation(ctx, R.anim.blink);
+    // 		v.startAnimation(a);
+    // 	}
+    // 	else{
+    // 		v.clearAnimation();
+    // 	}
+    // }
 
 
 
@@ -211,7 +210,7 @@ public class Library {
 
 		double l = (double)(e - s);
 		//long end = System.currentTimeMillis();
-		//Log.d(TAG, "RMS Comp Time: " + (end - start) + "ms");
+		//System.out.println(TAG +  "RMS Comp Time: " + (end - start) + "ms");
 		return Math.sqrt((double)sum / l);
 
 	}
@@ -278,7 +277,7 @@ public class Library {
 
 		double l = (double)(e - s);
 		//long end = System.currentTimeMillis();
-		//Log.d(TAG, "RMS Comp Time: " + (end - start) + "ms");
+		//System.out.println(TAG +  "RMS Comp Time: " + (end - start) + "ms");
 		return Math.sqrt((double)sum / l);
 
 	}
@@ -334,7 +333,7 @@ public class Library {
 
 	public static void print(double[] arr){
 		for(int i = 0; i < arr.length; i++){
-			Log.d(TAG, "arr [" + i + "]: " + arr[i]);
+			System.out.println(TAG +  "arr [" + i + "]: " + arr[i]);
 
 			Integer tmp = new Integer(0);
 		}
@@ -409,7 +408,7 @@ public class Library {
         for(int i = 0; i < data.length; i++){
             //b.putDouble(data[i]);
             int tmp = (int)data[i];
-            Log.d(TAG, "val: " + tmp);
+            System.out.println(TAG +  "val: " + tmp);
             b.putInt(tmp);
         }
         return b.array();
@@ -428,8 +427,8 @@ public class Library {
 
     public static byte[] shortArray2ByteArray(short[] data){
         byte[] byteData = new byte[data.length * 2]; // 2 bytes in a short
-        //Log.d(TAG, "byteData length: " + byteData.length);
-        //Log.d(TAG, "short[] data.length: " + data.length + "   * 2 = " + data.length*2);
+        //System.out.println(TAG +  "byteData length: " + byteData.length);
+        //System.out.println(TAG +  "short[] data.length: " + data.length + "   * 2 = " + data.length*2);
 
         for(int i = 0; i <  data.length; i++){
             short val = data[i];
@@ -473,7 +472,7 @@ public class Library {
             FileOutputStream fos = new FileOutputStream(f);
             fos.write(data);
             fos.close();
-            Log.d(TAG, "File dumped successfully to: " + f.getAbsolutePath());
+            System.out.println(TAG +  "File dumped successfully to: " + f.getAbsolutePath());
         }
         catch(FileNotFoundException e1){
             e1.printStackTrace();
@@ -515,7 +514,7 @@ public class Library {
             else { // middle samples
                 c = 1;
             }
-            //Log.d(TAG, "i: " + i + "   c: " + c);
+            //System.out.println(TAG +  "i: " + i + "   c: " + c);
             input[i] = Library.double2Short(input[i] * c);
 
         }
@@ -555,7 +554,7 @@ public class Library {
         double L = input.length;
         for(int i = 0; i < input.length; i++){
             double c = 1 - Math.abs( (i - ((L-1)/2)) / (L/2) );
-            Log.d(TAG, "c: " + c);
+            System.out.println(TAG +  "c: " + c);
 
             input[i] = Library.double2Short(input[i] * c);
         }
@@ -706,7 +705,7 @@ public class Library {
 
         Complex[] out = Hilbert.transform(randVals);
         for(int i = 0; i < out.length; i++){
-            Log.d(TAG, "abs(out[i]): "  + out[i].abs());
+            System.out.println(TAG +  "abs(out[i]): "  + out[i].abs());
         }
 
 
@@ -731,11 +730,11 @@ public class Library {
 
     public static void printErrorAnalysis(String rec, String gnd){
         String err = Library.getErrors(rec, gnd);
-        Log.d(TAG, "rec : " + rec);
-        Log.d(TAG, "gnd : " + gnd);
-        Log.d(TAG, "err : " + err);
+        System.out.println(TAG +  "rec : " + rec);
+        System.out.println(TAG +  "gnd : " + gnd);
+        System.out.println(TAG +  "err : " + err);
         String locations = Library.getErrorLocations(rec, gnd);
-        Log.d(TAG, "Errors at: " + locations);
-        Log.d(TAG, errCnt(err) + " / " + err.length() + " Errors.  Percentage: " + String.format("%2.4f",Library.errPer(err)) + "%");
+        System.out.println(TAG +  "Errors at: " + locations);
+        System.out.println(TAG +  errCnt(err) + " / " + err.length() + " Errors.  Percentage: " + String.format("%2.4f",Library.errPer(err)) + "%");
     }
 }

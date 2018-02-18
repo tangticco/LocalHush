@@ -29,7 +29,6 @@ class Demodulator implements Runnable{
     public Demodulator(BlockingAudioList newBuffer, int newMode){
         super();
         a_data = newBuffer;
-
         if(newMode != Library.MODE_LONG && newMode != Library.MODE_SHORT){
             throw new IllegalArgumentException("Invalid MODE");
         }
@@ -54,19 +53,19 @@ class Demodulator implements Runnable{
 
 
         while (running) {
-            //Log.d(TAG, " ");
-            //Log.d(TAG, "Demod Runnable iteration");
+            //System.out.println(TAG +  " ");
+            //System.out.println(TAG +  "Demod Runnable iteration");
 
             try {
                 readQueue();
             } catch (InterruptedException ie){
-                Log.d(TAG, "Consumer interrupted!!");
+                System.out.println(TAG +  "Consumer interrupted!!");
                 running = false;
                 break;
             }
         }
 
-        Log.d(TAG, "Demod thread (consumer) finished.");
+        System.out.println(TAG +  "Demod thread (consumer) finished.");
     }
 
     private void readQueue() throws InterruptedException{
@@ -77,7 +76,7 @@ class Demodulator implements Runnable{
         // interesting result; my mouse click has a distinct and strong ultrasound signal!
         preChunk = Library.FIR(preChunk);
         double rms = Library.RMS(0, preChunk.length, preChunk);
-        //Log.d(TAG, "rms: " + rms);
+        //System.out.println(TAG +  "rms: " + rms);
 
         // needs fixing still.  Too slow for samsung phone
         // double c = correlation(hail, preChunk, 0);
@@ -87,14 +86,14 @@ class Demodulator implements Runnable{
             a_data.eat(50); // No packet here, skip forward a bunch
 
         } else {
-            Log.d(TAG, "Detected packet  rms: " + rms);
+            System.out.println(TAG +  "Detected packet  rms: " + rms);
 
             // This means we've found the hail signal and we need to decode_short the subsequent data
             // of this packet
             short[] data = a_data.slice(0, 2049); // must be a power of two for findHail to finish
             int startGuess = findHail(data);
             startGuess = startGuess + Library.HAIL_SIZE + Library.RAMP_SIZE;
-            Log.d(TAG, "startGuess: " + startGuess);
+            System.out.println(TAG +  "startGuess: " + startGuess);
 
             // -- Dump the audio of this packet for debugging purposes ---------------------- //
             // Record a chunk of audio, this causes weirdness when "insertFromFile" is
@@ -109,19 +108,19 @@ class Demodulator implements Runnable{
 
             // ---- Decode the Frames ------------------------------------------------------- //
             // Eat Hail and first ramp (before first frame)
-            //Log.d(TAG, "EATING: " + startGuess);
+            //System.out.println(TAG +  "EATING: " + startGuess);
             a_data.eat(startGuess);
-            Log.d(TAG, "Ate: " + startGuess);
+            System.out.println(TAG +  "Ate: " + startGuess);
 
             StringBuilder sb = new StringBuilder();
             StringBuilder sbECC = new StringBuilder();
 
             // Eat the beginning ramp before the first frame
             a_data.eat(Library.RAMP_SIZE);
-            Log.d(TAG, "Ate: " + Library.RAMP_SIZE);
+            System.out.println(TAG +  "Ate: " + Library.RAMP_SIZE);
 
             for(int i = 0; i < numFrames; i++) {
-                Log.d(TAG, "Decoding frame: " + i);
+                System.out.println(TAG +  "Decoding frame: " + i);
                 short[] frame = a_data.slice(0, Library.DATA_FRAME_SIZE+1);
 
                 String unchecked = null;
@@ -135,14 +134,14 @@ class Demodulator implements Runnable{
                 sbECC.append(ECC.eccCheckandExtract(unchecked));
 
                 // Eat this frame and the ending ramp and the starting ramp of the next frame
-                //Log.d(TAG, "EATING " + (Library.DATA_FRAME_SIZE + (Library.RAMP_SIZE * 2)));
+                //System.out.println(TAG +  "EATING " + (Library.DATA_FRAME_SIZE + (Library.RAMP_SIZE * 2)));
                 a_data.eat(Library.DATA_FRAME_SIZE + (Library.RAMP_SIZE * 2));
-                Log.d(TAG, "Ate: " + (Library.DATA_FRAME_SIZE + (Library.RAMP_SIZE *2)));
+                System.out.println(TAG +  "Ate: " + (Library.DATA_FRAME_SIZE + (Library.RAMP_SIZE *2)));
             }
 
             String binary = sb.toString();
             Tests.analyzeError(binary, mode);
-            Log.d(TAG, " ");
+            System.out.println(TAG +  " ");
             Tests.analyzeAfterECCError(sbECC.toString(), mode);
 
             // ------------------------------------------------------------------------------ //
@@ -159,7 +158,7 @@ class Demodulator implements Runnable{
         Complex[] in = Library.shortArrayToComplexArray(frameAudio);
         final Complex[] fftData = FFT.fft(in);
         final int startIdx = (int)(Math.round(Library.findStartingF() / (Library.SAMPLE_RATE / (fftData.length))));
-        //Log.d(TAG, "startIDX: " + startIdx);
+        //System.out.println(TAG +  "startIDX: " + startIdx);
 
 
         // The actual decoding / interpreting the signals --------------------------------------- //
@@ -189,10 +188,10 @@ class Demodulator implements Runnable{
 
             thresh = ((upAVG - downAVG) * GAMMA ) + downAVG;
             //thresholds.add(thresh);
-            //Log.d(TAG, "----");
-            //Log.d(TAG, "upList; " + upList);
-            //Log.d(TAG, "downList: " + downList);
-            //Log.d(TAG, "i: " + i + "  f: " + i * Library.SubCarrier_DELTA + "  cur: " + cur + "  thresh: " + thresh + "  upAvg: " + upAVG + "  downAvg: " + downAVG);
+            //System.out.println(TAG +  "----");
+            //System.out.println(TAG +  "upList; " + upList);
+            //System.out.println(TAG +  "downList: " + downList);
+            //System.out.println(TAG +  "i: " + i + "  f: " + i * Library.SubCarrier_DELTA + "  cur: " + cur + "  thresh: " + thresh + "  upAvg: " + upAVG + "  downAvg: " + downAVG);
 
             // Just a little funny business for the calibration sub-carriers
             // Calibration sub-carriers
@@ -227,7 +226,7 @@ class Demodulator implements Runnable{
         Complex[] in = Library.shortArrayToComplexArray(frameAudio);
         final Complex[] fftData = FFT.fft(in);
         final int startIdx = (int)(Math.round(Library.findStartingF() / (Library.SAMPLE_RATE / (fftData.length))));
-        //Log.d(TAG, "startIDX: " + startIdx);
+        //System.out.println(TAG +  "startIDX: " + startIdx);
 
 
         // The actual decoding / interpreting the signals --------------------------------------- //
@@ -256,10 +255,10 @@ class Demodulator implements Runnable{
 
             thresh = ((upAVG - downAVG) * GAMMA ) + downAVG;
             //thresholds.add(thresh);
-            //Log.d(TAG, "----");
-            //Log.d(TAG, "upList; " + upList);
-            //Log.d(TAG, "downList: " + downList);
-            //Log.d(TAG, "i: " + i + "  f: " + i * Library.SubCarrier_DELTA + "  cur: " + cur + "  thresh: " + thresh + "  upAvg: " + upAVG + "  downAvg: " + downAVG);
+            //System.out.println(TAG +  "----");
+            //System.out.println(TAG +  "upList; " + upList);
+            //System.out.println(TAG +  "downList: " + downList);
+            //System.out.println(TAG +  "i: " + i + "  f: " + i * Library.SubCarrier_DELTA + "  cur: " + cur + "  thresh: " + thresh + "  upAvg: " + upAVG + "  downAvg: " + downAVG);
 
             // Just a little funny business for the calibration sub-carriers
             // Calibration sub-carriers
@@ -310,10 +309,10 @@ class Demodulator implements Runnable{
                 offset = virtualI;
             }
         }
-        //Log.d(TAG, "Original angle at CS1 (bin433): " + phase[433]);
-        //Log.d(TAG, "0:" + SC1.calcVirtualPhase(0) + "  2: " + SC1.calcVirtualPhase(2));
-        //Log.d(TAG, "0:" + SC2.calcVirtualPhase(0) + "  2: " + SC2.calcVirtualPhase(2));
-        Log.d(TAG, "minDiff: " + minDiff + "   located at virtual index offset: " + offset);
+        //System.out.println(TAG +  "Original angle at CS1 (bin433): " + phase[433]);
+        //System.out.println(TAG +  "0:" + SC1.calcVirtualPhase(0) + "  2: " + SC1.calcVirtualPhase(2));
+        //System.out.println(TAG +  "0:" + SC2.calcVirtualPhase(0) + "  2: " + SC2.calcVirtualPhase(2));
+        System.out.println(TAG +  "minDiff: " + minDiff + "   located at virtual index offset: " + offset);
 
 
         // Decode the phases
@@ -334,7 +333,7 @@ class Demodulator implements Runnable{
             corr[j] = cur;
             j++;
 
-            //Log.d(TAG, "f: " + f + "   Original angle reading: " + phaseArr[i] +  "   adjusted: " + cur);
+            //System.out.println(TAG +  "f: " + f + "   Original angle reading: " + phaseArr[i] +  "   adjusted: " + cur);
             f = f + Library.SubCarrier_DELTA;
 
             if(i == 444){ // 1/2 way point, switch to other calibration sub-carrier
@@ -344,7 +343,7 @@ class Demodulator implements Runnable{
 
             // Calibration sub-carriers
             if(i == 433 || i == 460){
-                //Log.d(TAG, "Calibration, resetting current known angle");
+                //System.out.println(TAG +  "Calibration, resetting current known angle");
                 continue;
             }
 
@@ -369,7 +368,6 @@ class Demodulator implements Runnable{
         return bits;
     }
 
-
     // Dr. Novak
     // Find hail signal in this data
     private int findHail(short[] data) {
@@ -388,7 +386,7 @@ class Demodulator implements Runnable{
         for(int winOffset = 0; winOffset < data.length-known.length; winOffset++) {
             double xcorr = correlation(known, data, winOffset);
             xcorrData[winOffset] = xcorr;
-            //Log.d(TAG, "xcorr: " + xcorr);
+            //System.out.println(TAG +  "xcorr: " + xcorr);
         }
 
         // Envelope
@@ -408,8 +406,6 @@ class Demodulator implements Runnable{
         int ans = maxIdx;
         return ans;
     }
-
-
 
     // Dr. Novak
     // calculate the correlation between data and the items array at the given offset
@@ -449,7 +445,6 @@ class Demodulator implements Runnable{
         return cov / sigmax / sigmay;
     }
 
-
     private int[] abs(Complex[] input, int end){
         // The second 1/2 of the values are harmonics / great than nyquist.
         int[] output = new int[end];
@@ -459,7 +454,6 @@ class Demodulator implements Runnable{
         return output;
     }
 
-
     private double[] angle(Complex[] input, int end){
         // The second 1/2 of the values are harmones / greater than the nyquist.
         double[] output = new double[end];
@@ -467,10 +461,9 @@ class Demodulator implements Runnable{
             output[i] = input[i].phase();
             //output[i] = output[i] + Math.PI;
         }
-        //Log.d(TAG, "phase[432]:  " + output[432]);
+        //System.out.println(TAG +  "phase[432]:  " + output[432]);
         return output;
     }
-
 
     private int getMaxIndex(double[] data){
         double max = Double.MIN_VALUE;
@@ -485,7 +478,6 @@ class Demodulator implements Runnable{
         return maxIdx;
     }
 
-
     public static int getMinQueueSize(){
         // The hail signal is 300 samples and the loud part is 100 samples long
         // So 50 samples will definitely land in / on that 100 sample portion
@@ -496,7 +488,6 @@ class Demodulator implements Runnable{
         // data can be removed)
         return (int)Library.SAMPLE_RATE * 2; // 10 seconds of space
     }
-
 
     private String zip (String a, String b){
         if(a.length() != b.length()){

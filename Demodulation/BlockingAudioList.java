@@ -52,7 +52,7 @@ public class BlockingAudioList<E extends Short> {
         int times = (e-s);
         int cur = s;
         for(int i = 0; i < times; i++){
-            Log.d(TAG, "items[" + cur + "]:" + items[cur]);
+            System.out.println(TAG + "items[" + cur + "]:" + items[cur]);
             cur = inc(cur);
         }
     }
@@ -87,7 +87,7 @@ public class BlockingAudioList<E extends Short> {
             try {
                 // See comment for fastForward()
                 while (i == putIndex) {
-                    //Log.d(TAG, "Waiting for more samples because i == putIndex");
+                    //System.out.println(TAG, "Waiting for more samples because i == putIndex");
                     hasMore.await();
                 }
                 i = inc(i);
@@ -194,7 +194,7 @@ public class BlockingAudioList<E extends Short> {
         try {
             int cur = takeIndex;
             cur = slowForward(cur, s); // Blocking, must have lock, may be interrupted
-            //Log.d(TAG, "s: " + s + "   cur: " + cur + "   takeIndex: " + takeIndex + "   putIndex: " + putIndex);
+            //System.out.println(TAG, "s: " + s + "   cur: " + cur + "   takeIndex: " + takeIndex + "   putIndex: " + putIndex);
             //showData(cur-5, cur + 5);
             short[] ans = new short[((e - 1) - s)];
             for (int i = 0; i < ans.length; i++) {
@@ -266,7 +266,7 @@ public class BlockingAudioList<E extends Short> {
             }
             catch (FileNotFoundException e1){ return false; }
             catch (IOException e2) { return false; }
-            Log.d(TAG, "File dumped successfully to: " + pathName);
+            System.out.println(TAG + "File dumped successfully to: " + pathName);
             return true;
         } finally {
             lock.unlock();

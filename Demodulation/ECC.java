@@ -126,7 +126,7 @@ public class ECC {
         }
 
 
-        //Log.d(TAG, "Checking, numParityBits: " + String.valueOf(numParityBits));
+        //System.out.println(TAG +  "Checking, numParityBits: " + String.valueOf(numParityBits));
 
         //check for errors (Assume only one error now)
         int location = 0;
@@ -164,10 +164,10 @@ public class ECC {
                 parityBits.add(1);
                 test.append("1 ,");
                 location += (int)Math.pow(2, i);
-                //Log.d(TAG, "Locations is: " + String.valueOf(location));
+                //System.out.println(TAG +  "Locations is: " + String.valueOf(location));
             }
 
-            //Log.d(TAG, "sum is : " + String.valueOf(sum) + "; integer value is : " + String.valueOf(Integer.valueOf(originalData.substring(indexOfParityBit, indexOfParityBit+1))) + "Compare result is : " + String.valueOf(Integer.valueOf(originalData.substring(indexOfParityBit, indexOfParityBit+1)) == sum%2));
+            //System.out.println(TAG +  "sum is : " + String.valueOf(sum) + "; integer value is : " + String.valueOf(Integer.valueOf(originalData.substring(indexOfParityBit, indexOfParityBit+1))) + "Compare result is : " + String.valueOf(Integer.valueOf(originalData.substring(indexOfParityBit, indexOfParityBit+1)) == sum%2));
 
 
 
@@ -176,11 +176,11 @@ public class ECC {
 
         String checkingOverallParityBit = eccGetOverallParityBits(uncheckedString);
         if(location != 0 && Integer.valueOf(checkingOverallParityBit) == 0){
-            //Log.d(TAG, "There is two or more error. ");
+            //System.out.println(TAG +  "There is two or more error. ");
         }
 
 
-        //Log.d(TAG, "Checking Parity bits are : " + test.toString());
+        //System.out.println(TAG +  "Checking Parity bits are : " + test.toString());
 
         StringBuilder output = new StringBuilder(originalData);
 
@@ -190,11 +190,11 @@ public class ECC {
             if(originalData.substring(location-1, location).equals("0")){
                 output.replace(location-1, location, "1");
 
-                Log.d(TAG, "Corrected at Location: " + String.valueOf(location-1) + "Previous was: " + String.valueOf(originalData.charAt(location-1)) + " Now is: 1");
+                System.out.println(TAG +  "Corrected at Location: " + String.valueOf(location-1) + "Previous was: " + String.valueOf(originalData.charAt(location-1)) + " Now is: 1");
             }else{
                 output.replace(location-1, location, "0");
 
-                Log.d(TAG, "Corrected at Location: " + String.valueOf(location-1) + "Previous was: " + String.valueOf(originalData.charAt(location-1)) + " Now is: 0");
+                System.out.println(TAG +  "Corrected at Location: " + String.valueOf(location-1) + "Previous was: " + String.valueOf(originalData.charAt(location-1)) + " Now is: 0");
             }
 
 
