@@ -1,12 +1,16 @@
 package Demodulation;
 
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 /**
  * Created by enovak on 12/12/16.
  */
 
 // Producer/consumer model. This is the Consumer Thread
-class Demodulator implements Runnable{
+class Demodulator{
     private final static String TAG = Demodulator.class.getName();
 
     private BlockingAudioList<Short> a_data;
@@ -26,9 +30,9 @@ class Demodulator implements Runnable{
     StringBuilder eccString;
 
 
-    public Demodulator(BlockingAudioList newBuffer, int newMode){
+    public Demodulator(int newMode){
         super();
-        a_data = newBuffer;
+        // a_data = newBuffer; //this is replace by directly reading audio data from a file
         if(newMode != Library.MODE_LONG && newMode != Library.MODE_SHORT){
             throw new IllegalArgumentException("Invalid MODE");
         }
@@ -37,14 +41,11 @@ class Demodulator implements Runnable{
 
     }
 
-    private void stopSelf(){
-        running = false;
-        Thread.currentThread().interrupt();
-        return;
-    };
+    public void startDecoder(String absfilePath){
 
-    public void run() {
-        running = true;
+
+        //read the audio data first
+        insertFromFile(absfilePath);
 
         // Eat the first few samples prevent initial touch false positive
         try{
@@ -52,9 +53,8 @@ class Demodulator implements Runnable{
         } catch (InterruptedException e) {};
 
 
-        while (running) {
-            //System.out.println(TAG +  " ");
-            //System.out.println(TAG +  "Demod Runnable iteration");
+        while (a_data.count > 4096) {
+            //while the audio data is still possible to contain a full audio data
 
             try {
                 readQueue();
@@ -66,6 +66,30 @@ class Demodulator implements Runnable{
         }
 
         System.out.println(TAG +  "Demod thread (consumer) finished.");
+    }
+
+
+    public void insertFromFile(String absPath) {
+        File f = new File(absPath);
+        byte[] data;
+        try {
+            FileInputStream fis = new FileInputStream(f);
+            data = new byte[(int)f.length()];
+            fis.read(data);
+            Short[] sData = Library.byteArray2ShortArray(data);
+            a_data.insert(sData);
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+            return;
+
+        } catch (IOException e2) {
+            e2.printStackTrace();
+            return;
+
+        } catch (InterruptedException e3){
+            e3.printStackTrace();
+            return;
+        }
     }
 
     private void readQueue() throws InterruptedException{
