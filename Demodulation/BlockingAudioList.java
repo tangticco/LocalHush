@@ -293,6 +293,15 @@ public class BlockingAudioList<E extends Short> {
     }
 
 
+    public boolean isStillValid(Integer signalLength){
+        if(count < signalLength){
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
     // This is the status-quo method of use on the outside for implanting
     public void putNext(E item) throws InterruptedException {
         if(item == null) { throw new NullPointerException(); }

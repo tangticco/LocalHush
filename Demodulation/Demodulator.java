@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 /**
  * Created by enovak on 12/12/16.
+ * Modified by Zhuofan on 2/21/18
  */
 
-// Producer/consumer model. This is the Consumer Thread
 class Demodulator{
     private final static String TAG = Demodulator.class.getName();
 
@@ -53,7 +53,7 @@ class Demodulator{
         } catch (InterruptedException e) {};
 
 
-        while (a_data.count > 4096) {
+        while (a_data.isStillValid(4096)) {
             //while the audio data is still possible to contain a full audio data
 
             try {
