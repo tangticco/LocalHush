@@ -32,6 +32,7 @@ class Demodulator{
 
     public Demodulator(int newMode){
         super();
+        a_data = new BlockingAudioList(100000000);
         // a_data = newBuffer; //this is replace by directly reading audio data from a file
         if(newMode != Library.MODE_LONG && newMode != Library.MODE_SHORT){
             throw new IllegalArgumentException("Invalid MODE");
